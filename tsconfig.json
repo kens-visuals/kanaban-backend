@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "outDir": "dist",
+    "baseUrl": "src",
+    "sourceMap": true,
+    "module": "NodeNext",
+    "noImplicitAny": true,
+    "moduleResolution": "NodeNext"
+  },
+  "include": ["src/**/*"]
+}
