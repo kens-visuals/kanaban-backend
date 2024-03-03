@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 
+import taskRouter from './router/TaskRouter';
 import boardRouter from './router/BoardRouters';
 import columnRouter from './router/ColumnRouter';
 
@@ -19,6 +20,7 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
+app.use('/api', taskRouter);
 app.use('/api', boardRouter);
 app.use('/api', columnRouter);
 
