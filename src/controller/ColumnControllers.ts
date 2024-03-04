@@ -31,8 +31,11 @@ export const findColumnsByParentId = async (req: Request, res: Response) => {
 
 export const postColumn = async (req: Request, res: Response) => {
   try {
-    const { parent_board_id } = req.params as { parent_board_id: string };
-    const { name, color } = req.body as { name: string; color?: string };
+    const { name, color, parent_board_id } = req.body as {
+      name: string;
+      color?: string;
+      parent_board_id?: string;
+    };
 
     const newColumn = new Column({
       name,
