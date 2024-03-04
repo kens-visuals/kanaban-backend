@@ -3,6 +3,21 @@ import { Request, Response } from 'express';
 import { Board } from '../model/BoardModel';
 import { Column } from '../model/ColumnModel';
 
+import { updateColumns } from '../helper_functions/updateColumns';
+import { getRandomColorHex } from '../helper_functions/generateRandomColor';
+
+export type Column = {
+  color?: string;
+  column_name: string;
+  parent_board_id: string;
+};
+
+export type EditBoardRequest = {
+  board_name: string;
+  columns?: Exclude<Column, 'parent_board_id'>[];
+};
+
+// TESTED ✅
 export const findBoards = async (req: Request, res: Response) => {
   try {
     const boards = await Board.find();
@@ -12,37 +27,75 @@ export const findBoards = async (req: Request, res: Response) => {
   }
 };
 
+// TESTED ✅
 export const findBoardById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const board = await Board.findById(id);
+    const columns = await Column.find({ parent_board_id: id });
 
     if (!board) {
       res.status(404).json({ message: 'Board not found' });
     }
 
-    res.status(200).json(board);
+    res.status(200).json({ board, columns });
   } catch (error) {}
 };
 
-export const postBoard = async (req: Request, res: Response) => {
+// TESTED ✅
+export const createNewBoard = async (req: Request, res: Response) => {
+  const { columns, board_name } = req.body as {
+    board_name: string;
+    columns?: {
+      color?: string;
+      column_name: string;
+    }[];
+  };
+
   try {
-    const { name } = req.body as { name: string };
-
-    const newBoard = new Board({ name });
-
+    const newBoard = new Board({ name: board_name });
     await newBoard.save();
 
-    res.status(201).json(newBoard);
+    const parent_board_id = newBoard._id;
+
+    if (columns && columns.length > 0) {
+      const newColumns = columns?.map(async (column) => {
+        const newColumn = new Column({
+          name: column.column_name,
+          color: column.color || getRandomColorHex(),
+          parent_board_id: parent_board_id.toString(),
+        });
+        await newColumn.save();
+        return newColumn;
+      });
+
+      await Promise.all(newColumns);
+    }
+
+    res.status(201).json({
+      message: 'Board and column created successfully',
+      newBoard,
+      columns,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Error creating board and column:', error);
+    res.status(500).json({ message: 'Error creating board and column' });
   }
 };
 
+// TESTED ✅
 export const editBoard = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { board_name } = req.body as { board_name: string };
+    const { columns, board_name } = req.body as {
+      board_name: string;
+      columns?: {
+        _id?: string;
+        color?: string;
+        column_name: string;
+        parent_board_id: string;
+      }[];
+    };
 
     const updatedBoard = await Board.findByIdAndUpdate(
       id,
@@ -51,9 +104,13 @@ export const editBoard = async (req: Request, res: Response) => {
     ).exec();
 
     if (!updatedBoard) {
-      res
+      return res
         .status(404)
         .json({ message: 'Board not found, please check board ID' });
+    }
+
+    if (columns && columns.length > 0) {
+      await updateColumns(columns, id);
     }
 
     res

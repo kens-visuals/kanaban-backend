@@ -7,7 +7,7 @@ type BoardSchemaType = {
 };
 
 const BoardSchema = new mongoose.Schema<BoardSchemaType>(
-  { name: String },
+  { name: { type: String, required: true } },
   { timestamps: true }
 );
 

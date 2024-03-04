@@ -4,6 +4,7 @@ import { Column } from '../model/ColumnModel';
 
 import { getRandomColorHex } from '../helper_functions/generateRandomColor';
 
+// TESTED ✅
 export const findColumns = async (req: Request, res: Response) => {
   try {
     const columns = await Column.find();
@@ -14,10 +15,14 @@ export const findColumns = async (req: Request, res: Response) => {
   }
 };
 
+// TESTED ✅
 export const findColumnsByParentId = async (req: Request, res: Response) => {
   try {
     const { parent_board_id } = req.params as { parent_board_id: string };
+
     const columns = await Column.find({ parent_board_id });
+
+    console.log(typeof parent_board_id);
 
     if (!columns) {
       res.status(404).json({ message: 'No columns found' });
@@ -29,17 +34,18 @@ export const findColumnsByParentId = async (req: Request, res: Response) => {
   }
 };
 
+// TESTED ✅
 export const postColumn = async (req: Request, res: Response) => {
   try {
-    const { name, color, parent_board_id } = req.body as {
-      name: string;
+    const { column_name, color, parent_board_id } = req.body as {
+      column_name: string;
       color?: string;
-      parent_board_id?: string;
+      parent_board_id: string;
     };
 
     const newColumn = new Column({
-      name,
       parent_board_id,
+      name: column_name,
       color: color || getRandomColorHex(),
     });
 
@@ -51,6 +57,7 @@ export const postColumn = async (req: Request, res: Response) => {
   }
 };
 
+// TESTED ✅
 export const editColumn = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -76,6 +83,7 @@ export const editColumn = async (req: Request, res: Response) => {
   }
 };
 
+// TESTED ✅
 export const deleteColumn = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
