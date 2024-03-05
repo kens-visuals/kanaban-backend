@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { Board } from '../model/BoardModel';
 import { Column } from '../model/ColumnModel';
 
-import { updateColumns } from '../helper_functions/updateColumns';
+import { editColumns } from './ColumnControllers';
 import { getRandomColorHex } from '../helper_functions/generateRandomColor';
 
 export type Column = {
@@ -110,7 +110,7 @@ export const editBoard = async (req: Request, res: Response) => {
     }
 
     if (columns && columns.length > 0) {
-      await updateColumns(columns, id);
+      await editColumns(columns, id);
     }
 
     res

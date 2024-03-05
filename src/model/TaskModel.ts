@@ -2,19 +2,19 @@ import mongoose, { Schema } from 'mongoose';
 
 export type TaskSchemaType = {
   title: string;
-  description: string;
-  currentStatus: string;
+  description?: string;
+  current_status: string;
   subtasks?: Schema.Types.ObjectId[];
-  parentColumnId: Schema.Types.ObjectId;
+  parent_column_id: Schema.Types.ObjectId;
 };
 
 const TaskSchema = new mongoose.Schema<TaskSchemaType>(
   {
-    title: String,
     description: String,
-    currentStatus: String,
+    title: { type: String, required: true },
+    current_status: { type: String, required: true },
     subtasks: [{ ref: 'Subtask', type: Schema.Types.ObjectId }],
-    parentColumnId: {
+    parent_column_id: {
       ref: 'Column',
       required: true,
       type: Schema.Types.ObjectId,

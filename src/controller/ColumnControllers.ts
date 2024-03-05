@@ -5,24 +5,11 @@ import { Column } from '../model/ColumnModel';
 import { getRandomColorHex } from '../helper_functions/generateRandomColor';
 
 // TESTED ✅
-export const findColumns = async (req: Request, res: Response) => {
-  try {
-    const columns = await Column.find();
-
-    res.status(200).json(columns);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// TESTED ✅
 export const findColumnsByParentId = async (req: Request, res: Response) => {
   try {
     const { parent_board_id } = req.params as { parent_board_id: string };
 
     const columns = await Column.find({ parent_board_id });
-
-    console.log(typeof parent_board_id);
 
     if (!columns) {
       res.status(404).json({ message: 'No columns found' });
@@ -58,28 +45,41 @@ export const postColumn = async (req: Request, res: Response) => {
 };
 
 // TESTED ✅
-export const editColumn = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { name } = req.body as { name: string };
+export const editColumns = async (
+  columns: {
+    _id?: string;
+    color?: string;
+    column_name: string;
+    parent_board_id: string;
+  }[],
+  parent_board_id: string
+) => {
+  const existingColumns = await Column.find({ parent_board_id }).exec();
 
-    const updatedColumn = await Column.findByIdAndUpdate(
-      id,
-      { name },
-      { new: true }
-    ).exec();
+  for (const existingColumn of existingColumns) {
+    const updatedColumn = columns.find(
+      (column) => column._id === existingColumn._id.toString()
+    );
 
-    if (!updatedColumn) {
-      res
-        .status(404)
-        .json({ message: 'Column not found, please check column ID' });
+    if (updatedColumn) {
+      existingColumn.name = updatedColumn.column_name;
+      existingColumn.color = updatedColumn.color || getRandomColorHex();
+      await existingColumn.save();
     }
+  }
 
-    res
-      .status(200)
-      .json({ message: 'Column updated successfully', updatedColumn });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const newColumns = columns.filter(
+    (column) => !existingColumns.some((c) => c._id.toString() === column._id)
+  );
+
+  for (const newColumnData of newColumns) {
+    const newColumn = new Column({
+      parent_board_id,
+      name: newColumnData.column_name,
+      color: newColumnData.color || getRandomColorHex(),
+    });
+
+    await newColumn.save();
   }
 };
 
