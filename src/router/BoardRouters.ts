@@ -12,8 +12,8 @@ const boardRouter: Router = express.Router();
 
 boardRouter.get('/board', findBoards);
 boardRouter.put('/board/:id', editBoard);
+boardRouter.post('/board', createNewBoard);
 boardRouter.get('/board/:id', findBoardById);
 boardRouter.delete('/board/:id', deleteBoard);
-boardRouter.post('/create-new-board', createNewBoard);
 
 export default boardRouter;

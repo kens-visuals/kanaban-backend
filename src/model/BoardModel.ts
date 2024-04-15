@@ -2,12 +2,22 @@ import mongoose from 'mongoose';
 
 type BoardSchemaType = {
   name: string;
+  user_id: string;
   createdAt: Date;
   updatedAt: Date;
 };
 
 const BoardSchema = new mongoose.Schema<BoardSchemaType>(
-  { name: { type: String, required: true } },
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    user_id: {
+      type: String,
+      required: true,
+    },
+  },
   { timestamps: true }
 );
 

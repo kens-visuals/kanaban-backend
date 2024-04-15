@@ -49,6 +49,7 @@ export const editColumns = async (
   columns: {
     _id?: string;
     color?: string;
+    user_id: string;
     column_name: string;
     parent_board_id: string;
   }[],
@@ -75,6 +76,7 @@ export const editColumns = async (
   for (const newColumnData of newColumns) {
     const newColumn = new Column({
       parent_board_id,
+      user_id: newColumnData.user_id,
       name: newColumnData.column_name,
       color: newColumnData.color || getRandomColorHex(),
     });

@@ -20,7 +20,9 @@ export type EditBoardRequest = {
 // TESTED ✅
 export const findBoards = async (req: Request, res: Response) => {
   try {
-    const boards = await Board.find();
+    const { user_id } = req.body;
+    const boards = await Board.find({ user_id });
+
     res.status(200).json(boards);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -44,7 +46,8 @@ export const findBoardById = async (req: Request, res: Response) => {
 
 // TESTED ✅
 export const createNewBoard = async (req: Request, res: Response) => {
-  const { columns, board_name } = req.body as {
+  const { columns, board_name, user_id } = req.body as {
+    user_id: string;
     board_name: string;
     columns?: {
       color?: string;
@@ -53,7 +56,7 @@ export const createNewBoard = async (req: Request, res: Response) => {
   };
 
   try {
-    const newBoard = new Board({ name: board_name });
+    const newBoard = new Board({ name: board_name, user_id });
     await newBoard.save();
 
     const parent_board_id = newBoard._id;
@@ -61,6 +64,7 @@ export const createNewBoard = async (req: Request, res: Response) => {
     if (columns && columns.length > 0) {
       const newColumns = columns?.map(async (column) => {
         const newColumn = new Column({
+          user_id,
           name: column.column_name,
           color: column.color || getRandomColorHex(),
           parent_board_id: parent_board_id.toString(),
@@ -87,11 +91,13 @@ export const createNewBoard = async (req: Request, res: Response) => {
 export const editBoard = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { columns, board_name } = req.body as {
+    const { columns, board_name, user_id } = req.body as {
+      user_id: string;
       board_name: string;
       columns?: {
         _id?: string;
         color?: string;
+        user_id: string;
         column_name: string;
         parent_board_id: string;
       }[];
@@ -99,7 +105,7 @@ export const editBoard = async (req: Request, res: Response) => {
 
     const updatedBoard = await Board.findByIdAndUpdate(
       id,
-      { name: board_name },
+      { user_id, name: board_name },
       { new: true }
     ).exec();
 
@@ -121,12 +127,15 @@ export const editBoard = async (req: Request, res: Response) => {
   }
 };
 
+// TESTED ✅
 export const deleteBoard = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { user_id } = req.body as { user_id: string };
     const deletedBoard = await Board.findByIdAndDelete(id).exec();
 
     const deletedColumns = await Column.deleteMany({
+      user_id,
       parent_board_id: id,
     }).exec();
 
