@@ -5,6 +5,7 @@ import {
   findBoards,
   deleteBoard,
   findBoardById,
+  getBoardNames,
   createNewBoard,
 } from '../controller/BoardControllers';
 
@@ -15,5 +16,6 @@ boardRouter.put('/board/:id', editBoard);
 boardRouter.post('/board', createNewBoard);
 boardRouter.get('/board/:id', findBoardById);
 boardRouter.delete('/board/:id', deleteBoard);
+boardRouter.get('/board-names', getBoardNames);
 
 export default boardRouter;

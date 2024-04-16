@@ -30,17 +30,28 @@ export const findBoards = async (req: Request, res: Response) => {
 };
 
 // TESTED ✅
+export const getBoardNames = async (req: Request, res: Response) => {
+  try {
+    const { user_id } = req.body;
+    const boards = await Board.find({ user_id }).select('name');
+
+    res.status(200).json(boards);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// TESTED ✅
 export const findBoardById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const board = await Board.findById(id);
-    const columns = await Column.find({ parent_board_id: id });
 
     if (!board) {
       res.status(404).json({ message: 'Board not found' });
     }
 
-    res.status(200).json({ board, columns });
+    res.status(200).json({ board });
   } catch (error) {}
 };
 
