@@ -127,7 +127,7 @@ export const editBoard = async (req: Request, res: Response) => {
     }
 
     if (columns && columns.length > 0) {
-      await editColumns(columns, id);
+      await editColumns(columns, id, user_id);
     }
 
     res

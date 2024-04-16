@@ -7,9 +7,12 @@ import { getRandomColorHex } from '../helper_functions/generateRandomColor';
 // TESTED ✅
 export const findColumnsByParentId = async (req: Request, res: Response) => {
   try {
-    const { parent_board_id } = req.params as { parent_board_id: string };
+    const { user_id } = req.body as { user_id: string };
+    const { parent_board_id } = req.params as {
+      parent_board_id: string;
+    };
 
-    const columns = await Column.find({ parent_board_id });
+    const columns = await Column.find({ user_id, parent_board_id });
 
     if (!columns) {
       res.status(404).json({ message: 'No columns found' });
@@ -24,16 +27,18 @@ export const findColumnsByParentId = async (req: Request, res: Response) => {
 // TESTED ✅
 export const postColumn = async (req: Request, res: Response) => {
   try {
-    const { column_name, color, parent_board_id } = req.body as {
-      column_name: string;
+    const { user_id, column_name, color, parent_board_id } = req.body as {
       color?: string;
+      user_id: string;
+      column_name: string;
       parent_board_id: string;
     };
 
     const newColumn = new Column({
-      parent_board_id,
+      user_id,
       name: column_name,
       color: color || getRandomColorHex(),
+      parent_board_id: parent_board_id.toString(),
     });
 
     await newColumn.save();
@@ -53,9 +58,13 @@ export const editColumns = async (
     column_name: string;
     parent_board_id: string;
   }[],
-  parent_board_id: string
+  parent_board_id: string,
+  user_id: string
 ) => {
-  const existingColumns = await Column.find({ parent_board_id }).exec();
+  const existingColumns = await Column.find({
+    user_id,
+    parent_board_id,
+  }).exec();
 
   for (const existingColumn of existingColumns) {
     const updatedColumn = columns.find(
@@ -88,7 +97,8 @@ export const editColumns = async (
 // TESTED ✅
 export const deleteColumn = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
+    const { user_id } = req.body as { user_id: string };
 
     const deletedColumn = await Column.findByIdAndDelete(id).exec();
 
