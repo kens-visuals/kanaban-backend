@@ -1,12 +1,18 @@
-import { Schema } from 'mongoose';
+import { Types } from 'mongoose';
 import { Request, Response } from 'express';
 
 import { Subtask } from '../model/SubTask';
 import { Task, TaskSchemaType } from '../model/TaskModel';
 
-export const getTasks = async (req: Request, res: Response) => {
+// TESTED ✅
+export const getTasksByParentColumnId = async (req: Request, res: Response) => {
   try {
-    const tasks = await Task.find();
+    const { user_id } = req.body as { user_id: string };
+    const { parent_column_id } = req.params as { parent_column_id: string };
+
+    const tasks = await Task.find({ user_id, parent_column_id }).populate(
+      'subtasks'
+    );
 
     res.status(200).json(tasks);
   } catch (error) {
@@ -14,12 +20,18 @@ export const getTasks = async (req: Request, res: Response) => {
   }
 };
 
+// TESTED ✅
 export const createTask = async (req: Request, res: Response) => {
-  try {
-    let subtaskIds: Schema.Types.ObjectId[] = [];
-    const { title, description, current_status, subtasks, parent_column_id } =
-      req.body;
+  const {
+    title,
+    user_id,
+    subtasks,
+    description,
+    current_status,
+    parent_column_id,
+  } = req.body as TaskSchemaType;
 
+  try {
     if (!title || !current_status) {
       return res.status(400).json({
         message: 'Please provide a title and current status for the task.',
@@ -28,10 +40,11 @@ export const createTask = async (req: Request, res: Response) => {
 
     const newTaskData: TaskSchemaType = {
       title,
+      user_id,
       description,
       current_status,
       parent_column_id,
-      subtasks: subtaskIds,
+      subtasks: [],
     };
 
     const newTask = new Task(newTaskData);
@@ -39,7 +52,7 @@ export const createTask = async (req: Request, res: Response) => {
 
     if (subtasks && subtasks.length > 0) {
       const createdSubtasks = await Promise.all(
-        subtasks.map(async (subtaskTitle: string) => {
+        subtasks.map(async (subtaskTitle: Types.ObjectId) => {
           const subtask = new Subtask({
             completed: false,
             title: subtaskTitle,
@@ -49,9 +62,8 @@ export const createTask = async (req: Request, res: Response) => {
           return subtask._id;
         })
       );
-      subtaskIds = createdSubtasks.map((subtask) => subtask._id);
 
-      newTask.subtasks = subtaskIds;
+      newTask.subtasks = createdSubtasks;
       await newTask.save();
     }
 
@@ -62,24 +74,7 @@ export const createTask = async (req: Request, res: Response) => {
   }
 };
 
-export const findAllTasksWithSameColumnId = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const { parent_column_id } = req.params;
-    const tasks = await Task.find({ parent_column_id });
-
-    if (!tasks) {
-      res.status(404).json({ message: 'No tasks found' });
-    }
-
-    res.status(200).json(tasks);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
+// TESTED ✅
 export const editTask = async (req: Request, res: Response) => {
   try {
     const { task_id } = req.params;
@@ -127,6 +122,7 @@ export const editTask = async (req: Request, res: Response) => {
   }
 };
 
+// TESTED
 export const deleteTask = async (req: Request, res: Response) => {
   try {
     const { task_id } = req.params;

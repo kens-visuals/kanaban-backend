@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 import taskRouter from './router/TaskRouter';
 import boardRouter from './router/BoardRouters';
 import columnRouter from './router/ColumnRouter';
+import subTaskRouter from './router/SubTaskRouter';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -23,6 +24,7 @@ app.use(bodyParser.json());
 app.use('/api', taskRouter);
 app.use('/api', boardRouter);
 app.use('/api', columnRouter);
+app.use('/api', subTaskRouter);
 
 const server = http.createServer(app);
 

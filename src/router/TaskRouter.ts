@@ -1,17 +1,17 @@
 import express, { Router } from 'express';
 
 import {
-  getTasks,
+  editTask,
   createTask,
   deleteTask,
-  findAllTasksWithSameColumnId,
+  getTasksByParentColumnId,
 } from '../controller/TaskControllers';
 
 const taskRouter: Router = express.Router();
 
-taskRouter.get('/task', getTasks);
 taskRouter.post('/task', createTask);
+taskRouter.put('/task/:task_id', editTask);
 taskRouter.delete('/task/:task_id', deleteTask);
-taskRouter.get('/task/:parent_column_id', findAllTasksWithSameColumnId);
+taskRouter.get('/task/:parent_column_id', getTasksByParentColumnId);
 
 export default taskRouter;
