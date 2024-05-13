@@ -21,6 +21,10 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
+app.use('/api', (req, res, next) => {
+  res.status(200).json({ message: 'Hello World' });
+  next();
+});
 app.use('/api', taskRouter);
 app.use('/api', boardRouter);
 app.use('/api', columnRouter);
