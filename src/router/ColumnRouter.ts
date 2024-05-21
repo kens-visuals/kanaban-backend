@@ -10,6 +10,6 @@ const columnRouter: Router = express.Router();
 
 columnRouter.delete('/column/:id', deleteColumn);
 columnRouter.post('/column/:parent_board_id', postColumn);
-columnRouter.get('/column/:parent_board_id', findColumnsByParentId);
+columnRouter.get('/column/:user_id/:parent_board_id', findColumnsByParentId);
 
 export default columnRouter;

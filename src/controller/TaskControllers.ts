@@ -7,8 +7,10 @@ import { Task, TaskSchemaType } from '../model/TaskModel';
 // TESTED ✅
 export const getTasksByParentColumnId = async (req: Request, res: Response) => {
   try {
-    const { user_id } = req.body as { user_id: string };
-    const { parent_column_id } = req.params as { parent_column_id: string };
+    const { user_id, parent_column_id } = req.params as {
+      user_id: string;
+      parent_column_id: string;
+    };
 
     const tasks = await Task.find({ user_id, parent_column_id }).populate(
       'subtasks'
@@ -125,8 +127,11 @@ export const editTask = async (req: Request, res: Response) => {
 // TESTED
 export const deleteTask = async (req: Request, res: Response) => {
   try {
-    const { task_id } = req.params;
-    const deletedTask = await Task.findByIdAndDelete(task_id);
+    const { task_id, user_id } = req.params as {
+      task_id: string;
+      user_id: string;
+    };
+    const deletedTask = await Task.findOneAndDelete({ user_id, _id: task_id });
 
     if (!deletedTask) {
       return res.status(404).json({ message: 'Task not found' });

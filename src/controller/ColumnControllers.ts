@@ -7,8 +7,8 @@ import { getRandomColorHex } from '../helper_functions/generateRandomColor';
 // TESTED ✅
 export const findColumnsByParentId = async (req: Request, res: Response) => {
   try {
-    const { user_id } = req.body as { user_id: string };
-    const { parent_board_id } = req.params as {
+    const { user_id, parent_board_id } = req.params as {
+      user_id: string;
       parent_board_id: string;
     };
 
@@ -97,10 +97,12 @@ export const editColumns = async (
 // TESTED ✅
 export const deleteColumn = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params as { id: string };
-    const { user_id } = req.body as { user_id: string };
+    const { id, user_id } = req.params as { id: string; user_id: string };
 
-    const deletedColumn = await Column.findByIdAndDelete(id).exec();
+    const deletedColumn = await Column.findOneAndDelete({
+      _id: id,
+      user_id,
+    }).exec();
 
     if (!deletedColumn) {
       res
