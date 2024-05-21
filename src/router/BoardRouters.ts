@@ -11,11 +11,11 @@ import {
 
 const boardRouter: Router = express.Router();
 
-boardRouter.get('/board', findBoards);
-boardRouter.put('/board/:id', editBoard);
 boardRouter.post('/board', createNewBoard);
-boardRouter.get('/board/:id', findBoardById);
-boardRouter.delete('/board/:id', deleteBoard);
+boardRouter.get('/board/:user_id', findBoards);
+boardRouter.put('/board/:user_id/:id', editBoard);
+boardRouter.get('/board/:user_id/:id', findBoardById);
+boardRouter.delete('/board/:user_id/:id', deleteBoard);
 boardRouter.get('/board-names/:user_id', getBoardNames);
 
 export default boardRouter;

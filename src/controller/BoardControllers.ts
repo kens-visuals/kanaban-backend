@@ -20,7 +20,7 @@ export type EditBoardRequest = {
 // TESTED ✅
 export const findBoards = async (req: Request, res: Response) => {
   try {
-    const { user_id } = req.body;
+    const { user_id } = req.params as { user_id: string };
     const boards = await Board.find({ user_id });
 
     res.status(200).json(boards);
@@ -44,8 +44,8 @@ export const getBoardNames = async (req: Request, res: Response) => {
 // TESTED ✅
 export const findBoardById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const board = await Board.findById(id);
+    const { id, user_id } = req.params as { id: string; user_id: string };
+    const board = await Board.findOne({ _id: id, user_id }).exec();
 
     if (!board) {
       res.status(404).json({ message: 'Board not found' });
@@ -101,9 +101,8 @@ export const createNewBoard = async (req: Request, res: Response) => {
 // TESTED ✅
 export const editBoard = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const { columns, board_name, user_id } = req.body as {
-      user_id: string;
+    const { id, user_id } = req.params as { id: string; user_id: string };
+    const { columns, board_name } = req.body as {
       board_name: string;
       columns?: {
         _id?: string;
@@ -141,9 +140,12 @@ export const editBoard = async (req: Request, res: Response) => {
 // TESTED ✅
 export const deleteBoard = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const { user_id } = req.body as { user_id: string };
-    const deletedBoard = await Board.findByIdAndDelete(id).exec();
+    const { id, user_id } = req.params as { id: string; user_id: string };
+
+    const deletedBoard = await Board.findOneAndDelete({
+      _id: id,
+      user_id,
+    }).exec();
 
     const deletedColumns = await Column.deleteMany({
       user_id,
