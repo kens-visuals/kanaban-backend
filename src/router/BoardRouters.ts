@@ -16,6 +16,6 @@ boardRouter.put('/board/:id', editBoard);
 boardRouter.post('/board', createNewBoard);
 boardRouter.get('/board/:id', findBoardById);
 boardRouter.delete('/board/:id', deleteBoard);
-boardRouter.get('/board-names', getBoardNames);
+boardRouter.get('/board-names/:user_id', getBoardNames);
 
 export default boardRouter;

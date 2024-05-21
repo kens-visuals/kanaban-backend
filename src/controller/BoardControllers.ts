@@ -32,7 +32,7 @@ export const findBoards = async (req: Request, res: Response) => {
 // TESTED ✅
 export const getBoardNames = async (req: Request, res: Response) => {
   try {
-    const { user_id } = req.body;
+    const { user_id } = req.params as { user_id: string };
     const boards = await Board.find({ user_id }).select('name');
 
     res.status(200).json(boards);
