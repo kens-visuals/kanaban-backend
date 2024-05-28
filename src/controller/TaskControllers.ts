@@ -24,14 +24,9 @@ export const getTasksByParentColumnId = async (req: Request, res: Response) => {
 
 // TESTED ✅
 export const createTask = async (req: Request, res: Response) => {
-  const {
-    title,
-    user_id,
-    subtasks,
-    description,
-    current_status,
-    parent_column_id,
-  } = req.body as TaskSchemaType;
+  const { user_id } = req.params as { user_id: string };
+  const { title, subtasks, description, current_status, parent_column_id } =
+    req.body as TaskSchemaType;
 
   try {
     if (!title || !current_status) {

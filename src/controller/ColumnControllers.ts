@@ -27,9 +27,9 @@ export const findColumnsByParentId = async (req: Request, res: Response) => {
 // TESTED ✅
 export const postColumn = async (req: Request, res: Response) => {
   try {
-    const { user_id, column_name, color, parent_board_id } = req.body as {
+    const { user_id } = req.params as { user_id: string };
+    const { column_name, color, parent_board_id } = req.body as {
       color?: string;
-      user_id: string;
       column_name: string;
       parent_board_id: string;
     };

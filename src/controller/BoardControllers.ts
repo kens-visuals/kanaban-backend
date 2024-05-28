@@ -57,8 +57,8 @@ export const findBoardById = async (req: Request, res: Response) => {
 
 // TESTED ✅
 export const createNewBoard = async (req: Request, res: Response) => {
-  const { columns, board_name, user_id } = req.body as {
-    user_id: string;
+  const { user_id } = req.params as { user_id: string };
+  const { columns, board_name } = req.body as {
     board_name: string;
     columns?: {
       color?: string;
