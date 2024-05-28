@@ -11,7 +11,7 @@ import {
 
 const boardRouter: Router = express.Router();
 
-boardRouter.post('/board', createNewBoard);
+boardRouter.post('/board/:user_id', createNewBoard);
 boardRouter.get('/board/:user_id', findBoards);
 boardRouter.put('/board/:user_id/:id', editBoard);
 boardRouter.get('/board/:user_id/:id', findBoardById);
