@@ -10,8 +10,8 @@ import {
 const taskRouter: Router = express.Router();
 
 taskRouter.post('/task/:user_id', createTask);
-taskRouter.put('/task/:task_id', editTask);
-taskRouter.delete('/task/:task_id', deleteTask);
-taskRouter.get('/task/:parent_column_id', getTasksByParentColumnId);
+taskRouter.put('/task/:user_id/:task_id', editTask);
+taskRouter.delete('/task/:user_id/:task_id', deleteTask);
+taskRouter.get('/task/:user_id/:parent_column_id', getTasksByParentColumnId);
 
 export default taskRouter;
