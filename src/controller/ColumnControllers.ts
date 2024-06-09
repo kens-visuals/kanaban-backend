@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { Column } from '../model/ColumnModel';
 
 import { getRandomColorHex } from '../helper_functions/generateRandomColor';
+import { Task } from 'model/TaskModel';
 
 // TESTED ✅
 export const findColumnsByParentId = async (req: Request, res: Response) => {

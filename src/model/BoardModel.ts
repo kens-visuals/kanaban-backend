@@ -9,16 +9,20 @@ type BoardSchemaType = {
 
 const BoardSchema = new mongoose.Schema<BoardSchemaType>(
   {
-    name: {
-      type: String,
-      required: true,
-    },
-    user_id: {
-      type: String,
-      required: true,
-    },
+    name: { type: String, required: true },
+    user_id: { type: String, required: true },
   },
   { timestamps: true }
 );
+
+BoardSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: (_, ret) => {
+    ret.id = ret._id;
+    delete ret._id;
+    return ret;
+  },
+});
 
 export const Board = mongoose.model('Board', BoardSchema);
