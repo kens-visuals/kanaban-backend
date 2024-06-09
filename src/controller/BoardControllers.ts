@@ -72,10 +72,12 @@ export const createNewBoard = async (req: Request, res: Response) => {
     const newBoard = new Board({ name: board_name, user_id });
     await newBoard.save();
 
-    const parent_board_id = newBoard._id;
+    const parent_board_id = newBoard.id;
 
     if (columns && columns.length > 0) {
       const newColumns = columns?.map(async (column) => {
+        console.log('column:', column);
+
         const newColumn = new Column({
           user_id,
           name: column.column_name,
@@ -91,8 +93,7 @@ export const createNewBoard = async (req: Request, res: Response) => {
 
     res.status(201).json({
       message: 'Board and column created successfully',
-      newBoard,
-      columns,
+      data: { newBoard, columns },
     });
   } catch (error) {
     console.error('Error creating board and column:', error);
