@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 import { Column } from '../model/ColumnModel';
 
 import { getRandomColorHex } from '../helper_functions/generateRandomColor';
-import { Task } from 'model/TaskModel';
 
 // TESTED ✅
 export const findColumnsByParentId = async (req: Request, res: Response) => {
@@ -14,6 +13,27 @@ export const findColumnsByParentId = async (req: Request, res: Response) => {
     };
 
     const columns = await Column.find({ user_id, parent_board_id });
+
+    if (!columns) {
+      res.status(404).json({ message: 'No columns found' });
+    }
+
+    res.status(200).json(columns);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getColumnNamesByParentId = async (req: Request, res: Response) => {
+  try {
+    const { user_id, parent_board_id } = req.params as {
+      user_id: string;
+      parent_board_id: string;
+    };
+
+    const columns = await Column.find({ user_id, parent_board_id }).select(
+      'name'
+    );
 
     if (!columns) {
       res.status(404).json({ message: 'No columns found' });

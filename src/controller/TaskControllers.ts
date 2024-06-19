@@ -23,6 +23,31 @@ export const getTasksByParentColumnId = async (req: Request, res: Response) => {
 };
 
 // TESTED ✅
+export const getTaskById = async (req: Request, res: Response) => {
+  try {
+    const { task_id, user_id, parent_column_id } = req.params as {
+      task_id: string;
+      user_id: string;
+      parent_column_id: string;
+    };
+
+    const task = await Task.findOne({
+      user_id,
+      _id: task_id,
+      parent_column_id,
+    }).populate('subtasks');
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    res.status(200).json(task);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// TESTED ✅
 export const createTask = async (req: Request, res: Response) => {
   const { user_id } = req.params as { user_id: string };
   const { title, subtasks, description, current_status, parent_column_id } =
@@ -39,9 +64,9 @@ export const createTask = async (req: Request, res: Response) => {
       title,
       user_id,
       description,
+      subtasks: [],
       current_status,
       parent_column_id,
-      subtasks: [],
     };
 
     const newTask = new Task(newTaskData);
