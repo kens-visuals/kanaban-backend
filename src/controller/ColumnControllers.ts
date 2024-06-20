@@ -46,29 +46,29 @@ export const getColumnNamesByParentId = async (req: Request, res: Response) => {
 };
 
 // TESTED ✅
-export const postColumn = async (req: Request, res: Response) => {
-  try {
-    const { user_id } = req.params as { user_id: string };
-    const { column_name, color, parent_board_id } = req.body as {
-      color?: string;
-      column_name: string;
-      parent_board_id: string;
-    };
+// export const postColumn = async (req: Request, res: Response) => {
+//   try {
+//     const { user_id } = req.params as { user_id: string };
+//     const { column_name, color, parent_board_id } = req.body as {
+//       color?: string;
+//       column_name: string;
+//       parent_board_id: string;
+//     };
 
-    const newColumn = new Column({
-      user_id,
-      name: column_name,
-      color: color || getRandomColorHex(),
-      parent_board_id: parent_board_id.toString(),
-    });
+//     const newColumn = new Column({
+//       user_id,
+//       name: column_name,
+//       color: color || getRandomColorHex(),
+//       parent_board_id: parent_board_id.toString(),
+//     });
 
-    await newColumn.save();
+//     await newColumn.save();
 
-    res.status(201).json(newColumn);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+//     res.status(201).json(newColumn);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
 // TESTED ✅
 export const editColumns = async (

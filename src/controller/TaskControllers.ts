@@ -5,14 +5,14 @@ import { Subtask } from '../model/SubTask';
 import { Task, TaskSchemaType } from '../model/TaskModel';
 
 // TESTED ✅
-export const getTasksByParentColumnId = async (req: Request, res: Response) => {
+export const getTasksByParentBoardId = async (req: Request, res: Response) => {
   try {
-    const { user_id, parent_column_id } = req.params as {
+    const { user_id, parent_board_id } = req.params as {
       user_id: string;
-      parent_column_id: string;
+      parent_board_id: string;
     };
 
-    const tasks = await Task.find({ user_id, parent_column_id }).populate(
+    const tasks = await Task.find({ user_id, parent_board_id }).populate(
       'subtasks'
     );
 
@@ -25,16 +25,16 @@ export const getTasksByParentColumnId = async (req: Request, res: Response) => {
 // TESTED ✅
 export const getTaskById = async (req: Request, res: Response) => {
   try {
-    const { task_id, user_id, parent_column_id } = req.params as {
+    const { task_id, user_id, parent_board_id } = req.params as {
       task_id: string;
       user_id: string;
-      parent_column_id: string;
+      parent_board_id: string;
     };
 
     const task = await Task.findOne({
       user_id,
       _id: task_id,
-      parent_column_id,
+      parent_board_id,
     }).populate('subtasks');
 
     if (!task) {
@@ -50,7 +50,7 @@ export const getTaskById = async (req: Request, res: Response) => {
 // TESTED ✅
 export const createTask = async (req: Request, res: Response) => {
   const { user_id } = req.params as { user_id: string };
-  const { title, subtasks, description, current_status, parent_column_id } =
+  const { title, subtasks, description, current_status, parent_board_id } =
     req.body as TaskSchemaType;
 
   try {
@@ -66,7 +66,7 @@ export const createTask = async (req: Request, res: Response) => {
       description,
       subtasks: [],
       current_status,
-      parent_column_id,
+      parent_board_id,
     };
 
     const newTask = new Task(newTaskData);
