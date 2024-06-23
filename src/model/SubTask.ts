@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-type SubtaskSchemaType = {
+export type SubtaskSchemaType = {
   title: string;
   completed: boolean;
   parent_task_id: Schema.Types.ObjectId;

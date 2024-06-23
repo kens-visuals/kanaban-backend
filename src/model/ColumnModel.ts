@@ -6,16 +6,14 @@ export type ColumnSchemaType = {
   user_id: string;
   createdAt: Date;
   updatedAt: Date;
-  tasks_count: number;
   parent_board_id: Schema.Types.ObjectId;
 };
 
 const ColumnSchema = new mongoose.Schema<ColumnSchemaType>(
   {
     color: String,
-    name: { type: String, required: true },
     user_id: { type: String, required: true },
-    tasks_count: { type: Number, default: 0 },
+    name: { type: String, required: true, unique: true },
     parent_board_id: {
       ref: 'Board',
       required: true,

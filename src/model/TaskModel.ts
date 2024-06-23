@@ -5,6 +5,7 @@ export type TaskSchemaType = {
   user_id: string;
   description?: string;
   current_status: string;
+  completed_subtasks: number;
   subtasks?: Types.ObjectId[];
   parent_board_id: Types.ObjectId;
 };
@@ -14,6 +15,7 @@ const TaskSchema = new mongoose.Schema<TaskSchemaType>(
     description: String,
     title: { type: String, required: true },
     user_id: { type: String, required: true },
+    completed_subtasks: { type: Number, default: 0 },
     current_status: { type: String, required: true },
     subtasks: [{ ref: 'Subtask', type: Types.ObjectId }],
     parent_board_id: {

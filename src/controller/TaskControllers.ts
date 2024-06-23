@@ -67,6 +67,7 @@ export const createTask = async (req: Request, res: Response) => {
       subtasks: [],
       current_status,
       parent_board_id,
+      completed_subtasks: 0,
     };
 
     const newTask = new Task(newTaskData);
@@ -76,7 +77,7 @@ export const createTask = async (req: Request, res: Response) => {
       const createdSubtasks = await Promise.all(
         subtasks.map(async (subtaskTitle: Types.ObjectId) => {
           const subtask = new Subtask({
-            completed: false,
+            completed: true,
             title: subtaskTitle,
             parent_task_id: newTask._id,
           });
@@ -100,7 +101,8 @@ export const createTask = async (req: Request, res: Response) => {
 export const editTask = async (req: Request, res: Response) => {
   try {
     const { task_id } = req.params;
-    const { title, description, current_status, subtasks } = req.body;
+    const { title, description, current_status, subtasks } =
+      req.body as TaskSchemaType;
 
     const task = await Task.findById(task_id);
 
@@ -122,18 +124,21 @@ export const editTask = async (req: Request, res: Response) => {
 
     if (subtasks && subtasks.length > 0) {
       const editedSubtasks = await Promise.all(
-        subtasks.map(async (subtaskTitle: string) => {
+        subtasks.map(async (subtaskTitle: Types.ObjectId) => {
           const subtask = new Subtask({
-            completed: false,
+            completed: true,
             title: subtaskTitle,
             parent_task_id: task._id,
           });
           await subtask.save();
-          return subtask._id;
+          return subtask;
         })
       );
 
       task.subtasks = editedSubtasks.map((subtask) => subtask._id);
+      task.completed_subtasks = editedSubtasks.filter(
+        (subtask) => subtask?.completed === true
+      ).length;
     }
 
     await task.save();
