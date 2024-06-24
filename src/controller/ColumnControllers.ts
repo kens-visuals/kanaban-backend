@@ -32,7 +32,7 @@ export const getColumnNamesByParentId = async (req: Request, res: Response) => {
     };
 
     const columns = await Column.find({ user_id, parent_board_id }).select(
-      'name'
+      'column_name'
     );
 
     if (!columns) {
@@ -96,7 +96,7 @@ export const editColumns = async (
       if (updatedColumn) {
         existingColumn.column_name = updatedColumn.column_name;
         existingColumn.color = updatedColumn.color || getRandomColorHex();
-        await existingColumn.save();
+        await existingColumn.updateOne();
       } else {
         await existingColumn.deleteOne();
       }

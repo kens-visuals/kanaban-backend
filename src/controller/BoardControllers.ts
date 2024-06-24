@@ -132,9 +132,10 @@ export const editBoard = async (req: Request, res: Response) => {
     await editColumns(columns, id, user_id);
     // }
 
-    res
-      .status(200)
-      .json({ message: 'Board updated successfully', updatedBoard });
+    res.status(200).json({
+      message: 'Board updated successfully',
+      updatedBoard,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
