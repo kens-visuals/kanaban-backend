@@ -149,7 +149,7 @@ export const editTask = async (req: Request, res: Response) => {
   }
 };
 
-// TESTED
+// TESTED ✅
 export const deleteTask = async (req: Request, res: Response) => {
   try {
     const { task_id, user_id } = req.params as {

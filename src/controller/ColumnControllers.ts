@@ -73,7 +73,7 @@ export const getColumnNamesByParentId = async (req: Request, res: Response) => {
 // TESTED ✅
 export const editColumns = async (
   columns: {
-    _id?: string;
+    id?: string;
     color?: string;
     user_id: string;
     column_name: string;
@@ -82,36 +82,42 @@ export const editColumns = async (
   parent_board_id: string,
   user_id: string
 ) => {
-  const existingColumns = await Column.find({
-    user_id,
-    parent_board_id,
-  }).exec();
+  try {
+    const existingColumns = await Column.find({
+      user_id,
+      parent_board_id,
+    }).exec();
 
-  for (const existingColumn of existingColumns) {
-    const updatedColumn = columns.find(
-      (column) => column._id === existingColumn._id.toString()
+    for (const existingColumn of existingColumns) {
+      const updatedColumn = columns.find(
+        (column) => column.id === existingColumn._id.toString()
+      );
+
+      if (updatedColumn) {
+        existingColumn.column_name = updatedColumn.column_name;
+        existingColumn.color = updatedColumn.color || getRandomColorHex();
+        await existingColumn.save();
+      } else {
+        await existingColumn.deleteOne();
+      }
+    }
+
+    const newColumns = columns.filter(
+      (column) => !existingColumns.some((c) => c._id.toString() === column.id)
     );
 
-    if (updatedColumn) {
-      existingColumn.name = updatedColumn.column_name;
-      existingColumn.color = updatedColumn.color || getRandomColorHex();
-      await existingColumn.save();
+    for (const newColumnData of newColumns) {
+      const newColumn = new Column({
+        user_id,
+        parent_board_id,
+        column_name: newColumnData.column_name,
+        color: newColumnData.color || getRandomColorHex(),
+      });
+
+      await newColumn.save();
     }
-  }
-
-  const newColumns = columns.filter(
-    (column) => !existingColumns.some((c) => c._id.toString() === column._id)
-  );
-
-  for (const newColumnData of newColumns) {
-    const newColumn = new Column({
-      parent_board_id,
-      user_id: newColumnData.user_id,
-      name: newColumnData.column_name,
-      color: newColumnData.color || getRandomColorHex(),
-    });
-
-    await newColumn.save();
+  } catch (error) {
+    console.error('Error editing columns:', error);
   }
 };
 
@@ -121,7 +127,7 @@ export const deleteColumn = async (req: Request, res: Response) => {
     const { id, user_id } = req.params as { id: string; user_id: string };
 
     const deletedColumn = await Column.findOneAndDelete({
-      _id: id,
+      id: id,
       user_id,
     }).exec();
 

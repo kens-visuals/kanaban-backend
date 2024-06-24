@@ -80,7 +80,7 @@ export const createNewBoard = async (req: Request, res: Response) => {
 
         const newColumn = new Column({
           user_id,
-          name: column.column_name,
+          column_name: column.column_name,
           color: column.color || getRandomColorHex(),
           parent_board_id: parent_board_id.toString(),
         });
@@ -128,9 +128,9 @@ export const editBoard = async (req: Request, res: Response) => {
         .json({ message: 'Board not found, please check board ID' });
     }
 
-    if (columns && columns.length > 0) {
-      await editColumns(columns, id, user_id);
-    }
+    // if (columns && columns.length > 0) {
+    await editColumns(columns, id, user_id);
+    // }
 
     res
       .status(200)
