@@ -8,8 +8,8 @@ export type SubtaskSchemaType = {
 
 const SubtaskSchema = new Schema<SubtaskSchemaType>(
   {
-    completed: Boolean,
     title: { type: String, required: true },
+    completed: { type: Boolean, default: false },
     parent_task_id: { type: Schema.Types.ObjectId, required: true },
   },
   { timestamps: true }

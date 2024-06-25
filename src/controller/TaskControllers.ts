@@ -77,7 +77,7 @@ export const createTask = async (req: Request, res: Response) => {
       const createdSubtasks = await Promise.all(
         subtasks.map(async (subtaskTitle: Types.ObjectId) => {
           const subtask = new Subtask({
-            completed: true,
+            completed: false,
             title: subtaskTitle,
             parent_task_id: newTask._id,
           });
@@ -126,7 +126,7 @@ export const editTask = async (req: Request, res: Response) => {
       const editedSubtasks = await Promise.all(
         subtasks.map(async (subtaskTitle: Types.ObjectId) => {
           const subtask = new Subtask({
-            completed: true,
+            completed: false,
             title: subtaskTitle,
             parent_task_id: task._id,
           });
