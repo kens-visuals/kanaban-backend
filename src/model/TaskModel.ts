@@ -8,6 +8,7 @@ export type TaskSchemaType = {
   completed_subtasks: number;
   subtasks?: Types.ObjectId[];
   parent_board_id: Types.ObjectId;
+  updatedAt?: Date;
 };
 
 const TaskSchema = new mongoose.Schema<TaskSchemaType>(
@@ -26,6 +27,11 @@ const TaskSchema = new mongoose.Schema<TaskSchemaType>(
   },
   { timestamps: true }
 );
+
+TaskSchema.pre('save', function (next) {
+  this.updatedAt = new Date();
+  next();
+});
 
 TaskSchema.set('toJSON', {
   virtuals: true,

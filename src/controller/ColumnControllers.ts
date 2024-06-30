@@ -46,36 +46,10 @@ export const getColumnNamesByParentId = async (req: Request, res: Response) => {
 };
 
 // TESTED ✅
-// export const postColumn = async (req: Request, res: Response) => {
-//   try {
-//     const { user_id } = req.params as { user_id: string };
-//     const { column_name, color, parent_board_id } = req.body as {
-//       color?: string;
-//       column_name: string;
-//       parent_board_id: string;
-//     };
-
-//     const newColumn = new Column({
-//       user_id,
-//       name: column_name,
-//       color: color || getRandomColorHex(),
-//       parent_board_id: parent_board_id.toString(),
-//     });
-
-//     await newColumn.save();
-
-//     res.status(201).json(newColumn);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-// TESTED ✅
 export const editColumns = async (
   columns: {
-    id?: string;
+    id: string;
     color?: string;
-    user_id: string;
     column_name: string;
     parent_board_id: string;
   }[],
@@ -88,17 +62,52 @@ export const editColumns = async (
       parent_board_id,
     }).exec();
 
+    const bulkOps = [];
+    const result: {
+      updated: {
+        id: string;
+        column_name: string;
+        color: string;
+      }[];
+      deleted: { id: string }[];
+      inserted: {
+        id: string;
+        column_name: string;
+        color: string;
+      }[];
+    } = {
+      updated: [],
+      deleted: [],
+      inserted: [],
+    };
+
     for (const existingColumn of existingColumns) {
       const updatedColumn = columns.find(
         (column) => column.id === existingColumn._id.toString()
       );
 
       if (updatedColumn) {
-        existingColumn.column_name = updatedColumn.column_name;
-        existingColumn.color = updatedColumn.color || getRandomColorHex();
-        await existingColumn.updateOne();
+        bulkOps.push({
+          updateOne: {
+            filter: { _id: existingColumn._id },
+            update: {
+              column_name: updatedColumn.column_name?.trim(),
+              color: updatedColumn.color || getRandomColorHex(),
+            },
+          },
+        });
+        result.updated.push({
+          id: existingColumn._id.toString(),
+          column_name: updatedColumn.column_name?.trim(),
+          color: updatedColumn.color,
+        });
       } else {
-        await existingColumn.deleteOne();
+        bulkOps.push({
+          deleteOne: {
+            filter: { _id: existingColumn._id },
+          },
+        });
+        result.deleted.push({ id: existingColumn._id.toString() });
       }
     }
 
@@ -110,14 +119,27 @@ export const editColumns = async (
       const newColumn = new Column({
         user_id,
         parent_board_id,
-        column_name: newColumnData.column_name,
+        column_name: newColumnData.column_name?.trim(),
         color: newColumnData.color || getRandomColorHex(),
       });
 
-      await newColumn.save();
+      bulkOps.push({ insertOne: { document: newColumn } });
+
+      result.inserted.push({
+        color: newColumnData.color,
+        id: newColumn._id.toString(),
+        column_name: newColumnData.column_name?.trim(),
+      });
     }
+
+    if (bulkOps.length > 0) {
+      await Column.bulkWrite(bulkOps);
+    }
+
+    return result;
   } catch (error) {
     console.error('Error editing columns:', error);
+    throw error;
   }
 };
 
