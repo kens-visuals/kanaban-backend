@@ -106,7 +106,7 @@ export const editBoard = async (req: Request, res: Response) => {
     const { columns, board_name } = req.body as {
       board_name: string;
       columns?: {
-        id?: string;
+        id: string;
         color?: string;
         user_id: string;
         column_name: string;
@@ -126,13 +126,12 @@ export const editBoard = async (req: Request, res: Response) => {
         .json({ message: 'Board not found, please check board ID' });
     }
 
-    // if (columns && columns.length > 0) {
-    await editColumns(columns, id, user_id);
-    // }
+    const editedColumns = await editColumns(columns, id, user_id);
 
     res.status(200).json({
       message: 'Board updated successfully',
       updatedBoard,
+      editedColumns,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

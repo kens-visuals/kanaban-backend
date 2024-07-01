@@ -4,6 +4,7 @@ export type SubtaskSchemaType = {
   title: string;
   completed: boolean;
   parent_task_id: Schema.Types.ObjectId;
+  updatedAt?: Date;
 };
 
 const SubtaskSchema = new Schema<SubtaskSchemaType>(
@@ -14,6 +15,11 @@ const SubtaskSchema = new Schema<SubtaskSchemaType>(
   },
   { timestamps: true }
 );
+
+SubtaskSchema.pre('save', function (next) {
+  this.updatedAt = new Date();
+  next();
+});
 
 SubtaskSchema.set('toJSON', {
   virtuals: true,

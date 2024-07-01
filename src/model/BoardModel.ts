@@ -15,6 +15,11 @@ const BoardSchema = new mongoose.Schema<BoardSchemaType>(
   { timestamps: true }
 );
 
+BoardSchema.pre('save', function (next) {
+  this.updatedAt = new Date();
+  next();
+});
+
 BoardSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,

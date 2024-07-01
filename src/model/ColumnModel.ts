@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 export type ColumnSchemaType = {
   color?: string;
-  user_id: string;
+  user_id?: string;
   createdAt: Date;
   updatedAt: Date;
   column_name: string;
@@ -12,7 +12,7 @@ export type ColumnSchemaType = {
 const ColumnSchema = new mongoose.Schema<ColumnSchemaType>(
   {
     color: String,
-    user_id: { type: String, required: true },
+    user_id: String,
     column_name: { type: String, required: true, unique: true },
     parent_board_id: {
       ref: 'Board',
@@ -22,6 +22,11 @@ const ColumnSchema = new mongoose.Schema<ColumnSchemaType>(
   },
   { timestamps: true }
 );
+
+ColumnSchema.pre('save', function (next) {
+  this.updatedAt = new Date();
+  next();
+});
 
 ColumnSchema.set('toJSON', {
   virtuals: true,
