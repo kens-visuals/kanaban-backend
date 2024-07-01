@@ -76,8 +76,6 @@ export const createNewBoard = async (req: Request, res: Response) => {
 
     if (columns && columns.length > 0) {
       const newColumns = columns?.map(async (column) => {
-        console.log('column:', column);
-
         const newColumn = new Column({
           user_id,
           column_name: column.column_name,
@@ -108,7 +106,7 @@ export const editBoard = async (req: Request, res: Response) => {
     const { columns, board_name } = req.body as {
       board_name: string;
       columns?: {
-        _id?: string;
+        id?: string;
         color?: string;
         user_id: string;
         column_name: string;

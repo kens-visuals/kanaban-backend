@@ -98,11 +98,131 @@ export const createTask = async (req: Request, res: Response) => {
 };
 
 // TESTED ✅
+// export const editTask = async (req: Request, res: Response) => {
+//   try {
+//     const { task_id } = req.params;
+//     const { title, description, current_status, subtasks } =
+//       req.body as TaskSchemaType;
+
+//     const task = await Task.findById(task_id);
+
+//     if (!task) {
+//       return res.status(404).json({ message: 'Task not found' });
+//     }
+
+//     if (title) {
+//       task.title = title;
+//     }
+
+//     if (description) {
+//       task.description = description;
+//     }
+
+//     if (current_status) {
+//       task.current_status = current_status;
+//     }
+
+//     if (subtasks && subtasks.length > 0) {
+//       const editedSubtasks = await Promise.all(
+//         subtasks.map(async (subtaskTitle: Types.ObjectId) => {
+//           const subtask = new Subtask({
+//             completed: false,
+//             title: subtaskTitle,
+//             parent_task_id: task._id,
+//           });
+//           await subtask.save();
+//           return subtask;
+//         })
+//       );
+
+//       task.subtasks = editedSubtasks.map((subtask) => subtask._id);
+//       task.completed_subtasks = editedSubtasks.filter(
+//         (subtask) => subtask?.completed === true
+//       ).length;
+//     }
+
+//     await task.save();
+
+//     res.status(200).json(task);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+// export const editTask = async (req: Request, res: Response) => {
+//   try {
+//     const { task_id } = req.params;
+//     const { title, description, current_status, subtasks } = req.body as {
+//       title: string;
+//       subtasks?: string[];
+//       description?: string;
+//       current_status: string;
+//     };
+
+//     const task = await Task.findById(task_id);
+
+//     if (!task) {
+//       return res.status(404).json({ message: 'Task not found' });
+//     }
+
+//     if (title) {
+//       task.title = title;
+//     }
+
+//     if (description) {
+//       task.description = description;
+//     }
+
+//     if (current_status) {
+//       task.current_status = current_status;
+//     }
+
+//     if (subtasks && subtasks.length > 0) {
+//       const existingSubtasks = await Subtask.find({ parent_task_id: task._id });
+
+//       const existingSubtasksMap = new Map(
+//         existingSubtasks.map((subtask) => [subtask.title.toString(), subtask])
+//       );
+
+//       const newSubtasks = subtasks.filter(
+//         (subtaskTitle) => !existingSubtasksMap.has(subtaskTitle)
+//       );
+
+//       const addedSubtasks = await Promise.all(
+//         newSubtasks.map(async (subtaskTitle: string) => {
+//           const subtask = new Subtask({
+//             completed: false,
+//             title: subtaskTitle,
+//             parent_task_id: task._id,
+//           });
+//           await subtask.save();
+//           return subtask;
+//         })
+//       );
+
+//       task.subtasks = [...existingSubtasks, ...addedSubtasks].map(
+//         (subtask) => subtask._id
+//       );
+//       task.completed_subtasks = existingSubtasks.filter(
+//         (subtask) => subtask.completed
+//       ).length;
+//     }
+
+//     await task.save();
+
+//     res.status(200).json(task);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 export const editTask = async (req: Request, res: Response) => {
   try {
     const { task_id } = req.params;
-    const { title, description, current_status, subtasks } =
-      req.body as TaskSchemaType;
+    const { title, description, current_status, subtasks } = req.body as {
+      title: string;
+      subtasks?: string[];
+      description?: string;
+      current_status: string;
+    };
 
     const task = await Task.findById(task_id);
 
@@ -123,20 +243,31 @@ export const editTask = async (req: Request, res: Response) => {
     }
 
     if (subtasks && subtasks.length > 0) {
-      const editedSubtasks = await Promise.all(
-        subtasks.map(async (subtaskTitle: Types.ObjectId) => {
-          const subtask = new Subtask({
-            completed: false,
-            title: subtaskTitle,
-            parent_task_id: task._id,
-          });
-          await subtask.save();
-          return subtask;
+      const existingSubtasks = await Subtask.find({ parent_task_id: task._id });
+
+      const existingSubtasksMap = new Map(
+        existingSubtasks.map((subtask) => [subtask.title.toString(), subtask])
+      );
+
+      // Update existing subtasks and add new subtasks
+      const updatedSubtasks = await Promise.all(
+        subtasks.map(async (subtaskTitle: string) => {
+          if (existingSubtasksMap.has(subtaskTitle)) {
+            return existingSubtasksMap.get(subtaskTitle);
+          } else {
+            const subtask = new Subtask({
+              completed: false,
+              title: subtaskTitle,
+              parent_task_id: task._id,
+            });
+            await subtask.save();
+            return subtask;
+          }
         })
       );
 
-      task.subtasks = editedSubtasks.map((subtask) => subtask._id);
-      task.completed_subtasks = editedSubtasks.filter(
+      task.subtasks = updatedSubtasks.map((subtask) => subtask._id);
+      task.completed_subtasks = updatedSubtasks.filter(
         (subtask) => subtask?.completed === true
       ).length;
     }
